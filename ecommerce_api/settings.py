@@ -27,6 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# Trusted origins for CSRF
+CSRF_TRUSTED_ORIGINS = [
+    'https://btobapi-production.up.railway.app',
+]
 
 # Application definition
 
