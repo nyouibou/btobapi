@@ -6,16 +6,20 @@ class BusinessUser(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=15)
     address = models.TextField()
-    registration_date = models.DateField()
-    business_license_number = models.CharField(max_length=100)
+    uploaded_file = models.FileField(upload_to='business_user_files/', blank=True, null=True)
+
+    def __str__(self):
+        return self.company_name
 
 class Offer(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    start_date = models.DateField()
-    end_date = models.DateField()
     discount_percentage = models.FloatField()
     applicable_minimum_quantity = models.IntegerField()
+    image = models.ImageField(upload_to='offer_images/', blank=True, null=True)  # Add image field
+
+    def __str__(self):
+        return self.title
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
