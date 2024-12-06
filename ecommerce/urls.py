@@ -8,6 +8,8 @@ router.register("offers", OfferViewSet)
 router.register("categories", CategoryViewSet)
 router.register("products", ProductViewSet)
 router.register("orders", OrderViewSet)
+router.register("ordersproducts", OrderProductViewSet)
+
 
 urlpatterns = [
     path("", include(router.urls)),
