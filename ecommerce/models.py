@@ -20,7 +20,7 @@ class BusinessUser(models.Model):
         """
         if self.referral_code == "leafcoin":
             cashback = total_order_amount * 0.05
-            self.cashback_amount = F('cashback_amount') + cashback
+            self.cashback_amount = ('cashback_amount') + cashback
             self.save()
             return cashback
         return 0
@@ -39,9 +39,11 @@ class Offer(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    image = models.ImageField(upload_to="categories/images/", blank=True, null=True)  # New image field
 
     def __str__(self):
         return self.name
+
 
 
 class Product(models.Model):
