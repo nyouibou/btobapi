@@ -1,10 +1,25 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from rest_framework import viewsets
 from .models import BusinessUser, Offer, Category, Product, Order, OrderProduct
 from .serializers import (
     BusinessUserSerializer, OfferSerializer, CategorySerializer,
-    ProductSerializer, OrderSerializer, OrderProductNestedSerializer
+    ProductSerializer, OrderSerializer, OrderProductNestedSerializer,PhoneNumberSerializer
 )
 
+class BusinessUserDetailView(APIView):
+    """
+    Retrieve details of a BusinessUser by their phone number.
+    """
+
+    def get(self, request, phone):
+        # Use the model's class method to fetch the user by phone number
+        business_user = BusinessUser.get_user_by_phone(phone)
+        if business_user:
+            serializer = BusinessUserSerializer(business_user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"detail": "BusinessUser not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class BusinessUserViewSet(viewsets.ModelViewSet):
     queryset = BusinessUser.objects.all()
@@ -34,3 +49,24 @@ class OrderViewSet(viewsets.ModelViewSet):
 class OrderProductViewSet(viewsets.ModelViewSet):
     queryset = OrderProduct.objects.all()
     serializer_class = OrderProductNestedSerializer
+    
+class GetUserByPhoneView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = PhoneNumberSerializer(data=request.data)
+        if serializer.is_valid():
+            phone = serializer.validated_data.get('phone')
+            user = BusinessUser.get_user_by_phone(phone)
+            if user:
+                # Respond with user details
+                user_data = {
+                    "company_name": user.company_name,
+                    "contact_person": user.contact_person,
+                    "phone": user.phone,
+                    "referral_code": user.referral_code,
+                    "cashback_amount": user.cashback_amount,
+                }
+                return Response(user_data, status=status.HTTP_200_OK)
+            else:
+                # User not found
+                return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

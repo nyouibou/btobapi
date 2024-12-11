@@ -4,7 +4,7 @@ from django.db import models
 class BusinessUser(models.Model):
     company_name = models.CharField(max_length=255)
     contact_person = models.CharField(max_length=255)
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(max_length=15, unique=True)  # Ensure phone number is unique for easier querying
     uploaded_file = models.FileField(upload_to='business_user_files/', blank=True, null=True)  # Optional field
     referral_code = models.CharField(max_length=50, blank=True, null=True)
     cashback_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -20,6 +20,16 @@ class BusinessUser(models.Model):
             return cashback
         return 0
 
+    @classmethod
+    def get_user_by_phone(cls, phone):
+        """
+        Fetches a BusinessUser instance by phone number.
+        Returns the user if found, otherwise returns None.
+        """
+        try:
+            return cls.objects.get(phone=phone)
+        except cls.DoesNotExist:
+            return None
 
 
 class Offer(models.Model):

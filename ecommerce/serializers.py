@@ -5,8 +5,15 @@ from .models import BusinessUser, Offer, Category, Product, Order, OrderProduct
 class BusinessUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessUser
-        fields = '__all__'
-
+        fields = [
+            'id',
+            'company_name',
+            'contact_person',
+            'phone',
+            'uploaded_file',
+            'referral_code',
+            'cashback_amount',
+        ]
 
 class OfferSerializer(serializers.ModelSerializer):
     class Meta:
@@ -123,3 +130,6 @@ class OrderSerializer(serializers.ModelSerializer):
                 )
 
         return instance
+
+class PhoneNumberSerializer(serializers.Serializer):
+    phone = serializers.CharField(max_length=15)
