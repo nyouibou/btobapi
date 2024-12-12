@@ -90,11 +90,14 @@ class Order(models.Model):
     billing_address = models.TextField()
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pending')
     order_type = models.CharField(max_length=50, choices=ORDER_TYPE_CHOICES)
-    cashback_applied = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Track cashback applied
+    cashback_applied = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    @classmethod
+    def get_orders_by_company_name(cls, company_name):
+        return cls.objects.filter(business_user__company_name__icontains=company_name)
 
     def save(self, *args, **kwargs):
-        # Apply referral cashback for orders
-        if not self.pk:  # Only apply on creation, not updates
+        if not self.pk:
             cashback = self.business_user.apply_referral_cashback(self.total_price)
             self.cashback_applied = cashback
         super().save(*args, **kwargs)
@@ -103,26 +106,11 @@ class Order(models.Model):
         return f"Order {self.id} - {self.business_user.company_name}"
 
 
-
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, related_name="order_products", on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def save(self, *args, **kwargs):
-        # Ensure enough stock is available
-        if self.product.stock_quantity < self.quantity:
-            raise ValueError(f"Not enough stock available for {self.product.product_name}.")
-
-        # Deduct stock on save
-        self.product.stock_quantity -= self.quantity
-        self.product.save()
-
-        # Calculate the total
-        self.total = self.price * self.quantity
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.quantity} x {self.product.product_name} for Order {self.order.id}"
-

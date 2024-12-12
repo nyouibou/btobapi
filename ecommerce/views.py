@@ -70,3 +70,11 @@ class GetUserByPhoneView(APIView):
                 # User not found
                 return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FetchOrdersByCustomerNameView(APIView):
+    def get(self, request, company_name):
+        orders = Order.get_orders_by_company_name(company_name)
+        if not orders.exists():
+            return Response({"detail": "No orders found for this company name."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

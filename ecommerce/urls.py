@@ -11,7 +11,9 @@ router.register("orders", OrderViewSet)
 router.register("ordersproducts", OrderProductViewSet)
 
 
+
 urlpatterns = [
     path("", include(router.urls)),
     path('business_user/<str:phone>/', BusinessUserDetailView.as_view(), name='business_user_detail'),
+    path('orders/by-customer/<str:company_name>/', FetchOrdersByCustomerNameView.as_view(), name='orders-by-customer'),
 ]
