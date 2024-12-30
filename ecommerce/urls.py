@@ -16,4 +16,5 @@ urlpatterns = [
     path("", include(router.urls)),
     path('business_user/<str:phone>/', BusinessUserDetailView.as_view(), name='business_user_detail'),
     path('orders/by-customer/<str:company_name>/', FetchOrdersByCustomerNameView.as_view(), name='orders-by-customer'),
+     path('businessuser/<int:pk>/delete/', DeleteBusinessUserView.as_view(), name='delete-business-user'),
 ]
