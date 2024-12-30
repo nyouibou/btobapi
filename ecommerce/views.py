@@ -10,16 +10,30 @@ from .serializers import (
 
 class BusinessUserDetailView(APIView):
     """
-    Retrieve details of a BusinessUser by their phone number.
+    Retrieve, update, or delete a BusinessUser by their phone number.
     """
-
+    
     def get(self, request, phone):
-        # Use the model's class method to fetch the user by phone number
+        # Retrieve BusinessUser by phone
         business_user = BusinessUser.get_user_by_phone(phone)
         if business_user:
             serializer = BusinessUserSerializer(business_user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({"detail": "BusinessUser not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    def delete(self, request, phone):
+        # Delete BusinessUser by phone number
+        try:
+            business_user = BusinessUser.get_user_by_phone(phone)
+            if business_user:
+                business_user.delete()
+                return Response({"message": "BusinessUser deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"detail": "BusinessUser not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+
     
 class BusinessUserViewSet(viewsets.ModelViewSet):
     queryset = BusinessUser.objects.all()
