@@ -21,33 +21,6 @@ class BusinessUserDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({"detail": "BusinessUser not found."}, status=status.HTTP_404_NOT_FOUND)
     
-class DeleteBusinessUserView(APIView):
-    """
-    Standalone endpoint to delete a BusinessUser by ID.
-    """
-
-    def delete(self, request, pk):
-        try:
-            business_user = BusinessUser.objects.get(pk=pk)
-
-            # Example: Prevent deletion if user has related orders
-            if business_user.orders.exists():
-                return Response(
-                    {"error": "Cannot delete a user with existing orders."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            business_user.delete()
-            return Response(
-                {"message": "BusinessUser deleted successfully."},
-                status=status.HTTP_204_NO_CONTENT,
-            )
-        except BusinessUser.DoesNotExist:
-            return Response(
-                {"error": "BusinessUser not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
 class BusinessUserViewSet(viewsets.ModelViewSet):
     queryset = BusinessUser.objects.all()
     serializer_class = BusinessUserSerializer
